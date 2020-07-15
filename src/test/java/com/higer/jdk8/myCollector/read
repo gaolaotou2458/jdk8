@@ -1,0 +1,23 @@
+自己实现一个set类型的收集器
+
+
+
+收集器：
+对于Collectors静态工厂类来说，其实现分为两种情况：
+
+1.通过CollectorImpl来实现
+2.通过reducing方法来实现，reducing方法本身又是通过CollectorImpl实现的
+
+
+
+joining:
+
+public static Collector<CharSequence, ?, String> joining(CharSequence delimiter,
+                                                             CharSequence prefix,
+                                                             CharSequence suffix) {
+        return new CollectorImpl<>(
+                () -> new StringJoiner(delimiter, prefix, suffix),
+                StringJoiner::add, StringJoiner::merge,
+                StringJoiner::toString, CH_NOID);
+    }
+

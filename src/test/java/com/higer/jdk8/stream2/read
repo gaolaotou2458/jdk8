@@ -1,0 +1,54 @@
+collector源码分析与收集器核心
+
+1.collect:收集器
+2.Collector作为Collect方法的参数
+3.Collector是一个接口，它是一个可变的汇聚操作，将输入元素累计到一个可变的结果容器中；它会在所有元素都处理完毕后
+将累计的结果转化为一个最终的标识（这是一个可选操作）.
+支持串行和并行两种方式执行。
+4.Collectors提供了关于Collectors的常见汇聚实现，Collectors本身上实际是一个工厂
+5.为了确保串行与并行操作结果的等价性，Collector函数需要满足两个条件：identity（同一性）与associativity（结合性），
+
+同一性：{ 中间结果和一个空的结果合并，最后返回的还是这个结果
+    6. a == combiner.apply(a, supplier.get())
+    (List<String> list1,List<String> list2) -> list1.addAll(list2); return list1;
+}
+
+
+combiner 函数 ，有4个线程同时去执行，就会生成4个部门结果。
+
+1,2,3,4
+1,2 -> 5
+5,3 -> 6
+6,4 -> 7
+
+结合性：
+ *     A a1 = supplier.get();
+ *     accumulator.accept(a1, t1);
+ *     accumulator.accept(a1, t2);
+ *     R r1 = finisher.apply(a1);  // result without splitting
+ *
+ *     A a2 = supplier.get();
+ *     accumulator.accept(a2, t1);
+ *     A a3 = supplier.get();
+ *     accumulator.accept(a3, t2);
+ *     R r2 = finisher.apply(combiner.apply(a2, a3));  // result with splitting
+
+
+ Stream:
+ public interface Stream<T> extends BaseStream<T, Stream<T>>
+
+ BaseStream:
+ public interface BaseStream<T, S extends BaseStream<T, S>>
+
+
+
+ ReferencePipeline标识流的源阶段与中间阶段
+ ReferencePipeline.Head 标识流的源阶段
+
+ 二者在大部分属性的设定上都是类似的，但存在一些属性不同的
+ 比如说Head是没有previousStage的，而ReferencePipline则是存在previousStage，等等。
+
+
+
+
+
