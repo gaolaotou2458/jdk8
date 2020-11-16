@@ -1,11 +1,24 @@
 package com.higer.jdk8.optional;
 
 import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
+import org.junit.Test;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class OptionalTest2 {
+
+    private static class User {
+        private String name;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
 
     public static void main(String[] args) {
         Employee employee = new Employee();
@@ -37,7 +50,24 @@ public class OptionalTest2 {
                 .orElse(Collections.emptyList()));
     }
 
+    private static User anoymos(){
+        return new User();
+    }
+    //有意义的用法
+    @Test
     public void test(Optional optional) {
+        User user = null;
+        Optional<User> optionalUser = Optional.ofNullable(user);
+        //存在即返回，空则提供默认值
+        optionalUser.orElse(new User());
+        //存在即返回，空则由函数去产生
+        optionalUser.orElseGet(() -> anoymos());
+        //村在即返回，否则抛出异常
+        optionalUser.orElseThrow(RuntimeException::new);
+        //存在才去做相应的事情
+        optionalUser.ifPresent(u -> System.out.println(u.getName()));
 
+        // map可以对 Optional 中的对象执行某种操作，且会返回一个Optional 对象
+        optionalUser.map(user1 -> user1.getName()).orElse("anymos");
     }
 }
